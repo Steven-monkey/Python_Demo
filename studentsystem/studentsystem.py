@@ -6,6 +6,7 @@ filename='students.txt'
 
 # 输出界面化菜单
 def menu():
+    os.system('clear')
     print(
     '''
     ******************学生信息管理系统**************
