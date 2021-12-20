@@ -32,38 +32,38 @@ def main():
     while(ctrl):              
         menu()                  #显示菜单
         option=input('请选择：') #显示菜单选项   
-        option_str=re.sub('\D',"",option)   #提取数字
+        option_str=re.sub('\D'," ",option)   #提取数字 \D =匹配任何非十进制字符
         if option_str in ['0','1','2','3','4','5','6','7']:
-            option_int=int(option_str)
-            if option_int ==0:  #退出系统
+            option_int=int(option_str)       #转换成整型
+            if option_int ==0:               #退出系统
                 print('您已经退出学生信息管理系统。')
-                ctrl=False
+                ctrl=False                   #输入0时，终止while循环  
             elif option_int==1:
-                insert()        #录入学生成绩信息
+                insert()                    #录入学生成绩信息
             elif option_int==2:
-                search()        #查找学生成绩信息
+                search()                    #查找学生成绩信息
             elif option_int==3:
-                delete()        #删除学生成绩信息
+                delete()                    #删除学生成绩信息
             elif option_int==4:
-                modify()        #修改学生成绩信息
+                modify()                    #修改学生成绩信息
             elif option_int==5:
-                sort()          #排序
+                sort()                      #排序
             elif option_int==6:
-                total()         #统计学生总数
+                total()                     #统计学生总数
             elif option_int==7:
-                show()          #显示所以学生信息
+                show()                      #显示所以学生信息
 
 '''1 录入学生信息'''
 #录入学生成绩信息
 def insert():
-    studentList=[]
+    studentList=[]                          #储存学生信息的列表
     mark=True
     while mark:
         id=input('请输入ID（如101）：')
-        if not id:
+        if not id:                          #ID为空就跳出循环
             break
         name=input('请输入名字：')
-        if not name:
+        if not name:                        #名字为空就跳出循环
             break
         try:
             english=int(input('请输入英语成绩：'))
@@ -72,14 +72,14 @@ def insert():
         except:
             print('输入值无效，不是整型数值...重新录入信息。')
             continue
-        student={
+        student={                           #将学生信息储存成字典形式
             'id':id,
             'name':name,
             'english':english,
             'python':python,
             'c':c
             }
-        studentList.append(student)
+        studentList.append(student)        #添加到列表中时，还是列表形式[{'id':12,'name':'monkey'}]
         inputMark=input('是否继续添加?(y/n):')
         if inputMark =='y':
             mark=True
@@ -87,6 +87,39 @@ def insert():
             mark=False
     save(studentList)
     print('学生信息录入完毕！')
+
+'''保存学生信息'''
+#将学生信息保存到文件
+def save(student):
+    try:
+        students_txt=open(filename,'a')
+    except Exception as e:
+        students_txt=open(filename,'w')
+    for info in student:                            #用循环挨个写入，就是普通的字典模式。
+        students_txt.write(str(info)+'\n')          #如果直接写入，依然是普通的列表模式
+    students_txt.close()
+
+'''显示学生信息的格式'''
+#将保存在列表中的学生信息显示出来
+def show_student(studentList):
+    if not studentList:
+        print('(o@.@o  无数据信息 （o@.@o）')
+        return
+    #定义标题显示格式  数字表示所占宽度，^表示居中显示  \t表示添加一个制表符
+    format_title="{:^6}{:^12}\t{:^8}\t{:^10}\t{:^10}\t{:^10}"
+    print(format_title.format('ID','name','英语成绩','Python成绩','C语言成绩','总成绩'))
+    #定义具体内容显示格式   数字表示所占宽度，^表示居中显示  \t表示添加一个制表符
+    format_data="{:^6}{:^12}\t{:^12}\t{:^12}\t{:^12}\t{:^12}"
+    for info in studentList:
+        print(
+            format_data.format(
+                info.get('id'),
+                info.get('name'),
+                str(info.get('english')),
+                str(info.get('python')),
+                str(info.get('c')),
+                
+                str(info.get('c')+info.get('python')+info.get('english')).center(12)))
 
 '''2 查找学生信息'''
 #查找学生成绩信息
@@ -96,7 +129,7 @@ def search():
     while mark:
         id=''
         name=''
-        if os.path.exists(filename):
+        if os.path.exists(filename):                    #判断文件是否存在
             mode=input('按ID查询输入1；按姓名查找输入2：')
             if mode=='1':
                 id=input('请输入学生ID：')
@@ -108,7 +141,7 @@ def search():
             with open(filename,'r') as file:
                 student=file.readlines()
                 for list in student:
-                    d=dict(eval(list))
+                    d=dict(eval(list))     #字符串转字典     
                     if id != "":
                         if d['id']==id:
                             student_query.append(d)
@@ -194,7 +227,7 @@ def modify():
                 wfile.write(student)    #将修改的写入文件
     mark=input('是否继续修改其他学生信息？（y/n）：')
     if mark=='y':
-        modify()        
+        modify()  
 
 '''5 排序'''
 #排序
@@ -223,7 +256,7 @@ def sort():
     elif mode=='2':
         student_new.sort(key=lambda x:x['python'],reverse=ascORdescBool)
     elif mode=='3':
-        student_new.sort(key=lambda x:x['python'],reverse=ascORdescBool)
+        student_new.sort(key=lambda x:x['c'],reverse=ascORdescBool)
     elif mode=='0':
         student_new.sort(key=lambda x:x['english']+x['python']+x['c'],reverse=ascORdescBool)
     else:
@@ -235,7 +268,7 @@ def sort():
 #统计学生总数
 def total():
     if os.path.exists(filename):
-        with open(filename,'r') as rfile:
+        with open(filename,'r') as rfile:               
             student_old=rfile.readlines()
             if student_old:
                 print('一共有%d名学生！'% len(student_old))
@@ -258,38 +291,7 @@ def show():
     else:
         print('暂未保存数据信息...')
 
-#将保存在列表中的学生信息显示出来
-def show_student(studentList):
-    if not studentList:
-        print('(o@.@o  无数据信息 （o@.@o）')
-        return
-    #定义标题显示格式
-    format_title="{:^6}{:^12}\t{:^8}\t{:^10}\t{:^10}\t{:^10}"
-    print(format_title.format('ID','name','英语成绩','Python成绩','C语言成绩','总成绩'))
-    #定义具体内容显示格式   数字表示所占宽度，^表示居中显示  \t表示添加一个制表符
-    format_data="{:^6}{:^12}\t{:^12}\t{:^12}\t{:^12}\t{:^12}"
-    for info in studentList:
-        print(
-            format_data.format(
-                info.get('id'),
-                info.get('name'),
-                str(info.get('english')),
-                str(info.get('python')),
-                str(info.get('c')),
-                
-                str(info.get('c')+info.get('python')+info.get('english')).center(12)))
 
-'''保存学生信息'''
-#将学生信息保存到文件
-def save(student):
-    try:
-        students_txt=open(filename,'a')
-    except Exception as e:
-        students_txt=open(filename,'w')
-    for info in student:
-        students_txt.write(str(info)+'\n')
-    students_txt.close()
-
-#执行函数
+#执行主函数
 if __name__=='__main__':
     main()
