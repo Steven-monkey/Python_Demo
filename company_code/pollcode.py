@@ -309,15 +309,6 @@ def codeprint(cstr, cint):
         print(strbook)
 
 
-def codeprint(cstr, cint):
-    str1 = cstr[0]
-    str2 = cstr[1]
-    str3 = cstr[2]
-    for i in range(int(cint)):
-        strbook = str1 + str2 + random.choice(letter) + random.choice(letter) + random.choice(letter) + str2 + str3
-        print(strbook)
-
-
 #验证菜单输错情况
 
 def input_validation(insel):
