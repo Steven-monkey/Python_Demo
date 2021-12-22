@@ -40,6 +40,10 @@ def openfile(filename):
     return fllist                   #返回读取文件的内容
 
 #用户输入内容函数
+'''
+showstr:需要提示的文字
+showorder: 1:就是要验证数字 2.就是要验证字母 3.
+'''
 def inputbox(showstr,showorder,length):
     instr=input(showstr)            #使用input函数要求用户输入信息，showstr位输入提示文字
     if len(instr)!=0:               #输入数据的长度不为0
@@ -50,12 +54,12 @@ def inputbox(showstr,showorder,length):
                     print('\033[1;31;40m 输入为零，请重新输入！！\033[0m')  #要求重新输入
                     return '0'
                 else:
-                    return instr
+                    return instr    #将输入的数据返回给函数
             else:
                 print('\033[1;31;40m 输入非法，请重新输入！！\033[0m')
                 return '0'
         if showorder==2:
-            if str.isalpha(instr):
+            if str.isalpha(instr):  #判断输是否为字母
                 if len(instr)!=length:
                     print('\033[1;31;40m   必须重新输入'+str(length)+'个字母，请重新输入！！\033[0m')
                     return '0'
@@ -65,12 +69,12 @@ def inputbox(showstr,showorder,length):
                 print('\033[1;31;40m 输入非法，请重新输入！！\033[0m')
                 return '0'
         if showorder==3:
-            if str.isdigit(instr):
-                if len(instr)!=length:
+            if str.isdigit(instr): #判断输入是否为数字
+                if len(instr)!=length: #验证数字是不是指定位数
                     print('\033[1;31;40m   必须重新输入'+str(length)+'个数字，请重新输入！！\033[0m')
                     return '0'
-                else:
-                    return instr
+                else:       
+                    return instr  #返回输入值
             else:
                 print('\033[1;31;40m 输入非法，请重新输入！！\033[0m')
                 return '0'
@@ -78,42 +82,40 @@ def inputbox(showstr,showorder,length):
         print('\033[1;31;40m 输入为空，请重新输入！！\033[0m')
         return '0'
       
-#读取防伪编码信息
-
+#写入文件防伪编码信息
 def wfile(sstr,sfile,typeis,smsg,datapath):
-    mkdir(datapath)             #调用创建文件夹函数
-    datafile=datapath+'/'+sfile 
-    file=open(datafile,'w')
-    wrlist=sstr
-    pdata=''
-    wdata=''
-    for i in range(len(wrlist)):
-        wdata=str(wrlist[i].replace('[','')).replace(']','')
-        wdata=wdata.replace(''''','').replace(''''' , '')
-        file.write(str(wdata))
-        pdata=pdata+wdata
-    file.close()
-    print('\033[1;31m'+pdata+'\033[0m')
-    if typeis!='no':
+    mkdir(datapath)                 #调用创建文件夹函数
+    datafile=datapath+'/'+sfile     #文件夹的路径和文件名
+    file=open(datafile,'w')         #打开保存防伪码的文件，如果文件不存在，则创建该文件
+    wrlist=sstr                     #将防伪码信心赋值给wlist
+    pdata=''                        #清空变量pdata，pdata存储屏幕输出的防伪码信息
+    wdata=''                        #清空变量wdata,wdata存储保存到文本文件到防伪码信息
+    for i in range(len(wrlist)):    #按条循环读取防伪码数据
+        wdata=str(wrlist[i].replace('[','')).replace(']','')    #去掉字符中的括号
+        wdata=wdata.replace(''''','').replace(''''' , '')       #去掉字符的引号
+        file.write(str(wdata))      #写入保存防伪码文件
+        pdata=pdata+wdata           #将单条防伪码文件保存在pdata
+    file.close()                    #关闭文件
+    print('\033[1;31m'+pdata+'\033[0m')#屏幕输出生成的防伪码信息
+    if typeis!='no':                #是否显示信息提示框，如果typeis的值为'no'，不显示
         tkinter.messagebox.showinfo('提示',smsg+str(len(randstr))+'\n 防伪码文件存放位置：'+datafile)
-        root.withdraw() #关闭辅助窗口
-
-
-#通过循环控制用户对程序功能的选择
+        root.withdraw() #关闭辅助窗口   #关闭辅助窗口
 
 
 #生成6位数字防伪码scode1()函数
 def scode1(schoice):
-    incount=inputbox("\033[1;32m     请输入您要生成验证码的数量:\33[0m", 1, 0)
+    #调用inputbox函数对输入进行非空、输入合法性判断
+    incount=inputbox("\033[1;32m     请输入您要生成验证码的数量:\33[0m", 1, 0)  
     while int(incount)==0:
         incount=inputbox("\033[1;32m     请输入您要生成验证码的数量:\33[0m", 1, 0)
-    randstr.clear()
-    for j in range(int(incount)):
-        randfir=''
-        for i in range(6):
-            randfir=randfir+random.choice(number)
-        randfir=randfir+'\n'
-        randstr.append(randfir)
+    randstr.clear()                 #清空保存批量防伪码信息的变量randstr
+    for j in range(int(incount)):   #根据输入的防伪码数量循环批量的生成防伪码
+        randfir=''                  #设置存储单条防伪码的变量为空
+        for i in range(6):          #循环生成单条防伪码
+            randfir=randfir+random.choice(number)   #产生数字随机因子
+        randfir=randfir+'\n'        #在单条防伪码后面添加转义换行符\n，使验证码单条列显示
+        randstr.append(randfir)     #将单条验证码添加到保存批量验证码的变量randstr
+    #调用函数wfile()，实现生成防伪码屏幕输出和文件输出
     wfile(randstr,"scode" + str(schoice)+ ".txt", "" , "已经生成6位防伪码共计：","codepath")
 
 #生成9位数防伪码的函数scode2()
@@ -262,7 +264,7 @@ def scode8(schoice):
 
 #实现企业粉丝抽奖
 def scode9(schoice):
-    default_dir=r'lottery.ini'
+    default_dir=r'lottery.ini'          #打开默认文件
     file_path=tkinter.filedialog.askopenfilename(filetypes=[('Ini file','*.txt')],title=u'请选择包含抽奖号码的抽奖文件：',initialdir=(os.path.expanduser(default_dir)))
     codelist=openfile(file_path)
     codelist=codelist.split('\n')
